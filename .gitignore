@@ -1,0 +1,9 @@
+
+.env
+*.code-workspace
+
+**/.yarn/cache
+
+dist
+dev-dist
+node_modules

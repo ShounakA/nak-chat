@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  backend:
+    build:
+      context: ./source/nak-chat-server
+    depends_on:
+      - ${REDIS_HOST}
+    ports:
+      - 5280:80
+      - 5281:443
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:443;http://+:80
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${KESTREL_SSL_PASSWORD}
+      ASPNETCORE_Kestrel__Certificates__Default__Path: ${KESTREL_SSL_PATH}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - ~/https:/https:ro
+  cache:
+    image: redis:7.0-alpine
+    restart: always
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes: 
+      - cache:/data
+volumes:
+  cache:
+    driver: local

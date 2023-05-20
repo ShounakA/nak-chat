@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
+WORKDIR /api
+
+# Copy everything
+COPY . .
+# Restore as distinct layers
+RUN dotnet restore
+# Build and publish a release
+RUN dotnet publish -c Release -o out
+
+EXPOSE 80 443
+
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
+WORKDIR /api
+COPY --from=build-env /api/out .
+ENTRYPOINT ["dotnet", "NakChatServer.dll"]
